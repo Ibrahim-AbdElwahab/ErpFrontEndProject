@@ -289,7 +289,6 @@ const filteredProducts = computed(() => {
     p.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
   );
 });
-
 const saveProduct = async () => {
   loading.value = true;
   try {
@@ -297,29 +296,22 @@ const saveProduct = async () => {
       name: newProduct.value.name,
       category_id: newProduct.value.category_id,
       purchase_price: newProduct.value.purchase_price,
-      sale_price: newProduct.value.sale_price, // هذا الاسم سيتلقاه الكنترولر ويحوله لـ selling_price
+      sale_price: newProduct.value.sale_price, // ده الاسم اللي الكنترولر فوق هيستقبله ويحوله
       stock_quantity: newProduct.value.stock_quantity || 0,
       barcode: newProduct.value.barcode || null,
     };
 
     await axios.post("http://127.0.0.1:8000/api/products", payload);
 
-    // إعادة تعيين النموذج
-    newProduct.value = {
-      name: "",
-      category_id: null,
-      stock_quantity: "",
-      purchase_price: "",
-      sale_price: "",
-    };
+    alert("تم إضافة الصنف بنجاح!");
+    showAddModal.value = false;
     fetchData();
   } catch (error) {
     console.error(error.response?.data);
-    alert("حدث خطأ في الحفظ، تأكد من ملء الحقول الأساسية");
+    alert("فشل الحفظ: تأكد من إدخال البيانات بشكل صحيح");
   }
   loading.value = false;
 };
-
 onMounted(fetchData);
 </script>
 
