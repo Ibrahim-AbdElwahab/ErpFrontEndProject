@@ -29,15 +29,15 @@
               </h3>
               <p class="text-xs text-gray-500 mt-1">
                 المخزن: {{ product.stock_quantity }} | السعر:
-                {{ product.sale_price }} ج
+                {{ product.selling_price || product.sale_price || 0 }} ج
               </p>
             </div>
           </div>
           <div
             v-if="filteredProducts.length === 0"
-            class="text-center py-10 text-gray-400"
+            class="text-center py-10 text-gray-400 font-bold"
           >
-            مفيش صنف بالاسم ده في المخزن!
+            مفيش أصناف متاحة! تأكد من إضافة أصناف في المخزن.
           </div>
         </div>
       </div>
@@ -61,7 +61,8 @@
               :key="client.id"
               :value="client.id"
             >
-              {{ client.name }} (عليه حالياً: {{ Math.abs(client.balance) }} ج)
+              {{ client.name }} (عليه حالياً:
+              {{ Math.abs(client.balance || 0) }} ج)
             </option>
           </select>
         </div>
@@ -71,7 +72,7 @@
             v-if="cart.length === 0"
             class="text-center py-10 text-gray-400 font-medium"
           >
-            🛒 الفاتورة فاضية.. اختار أصناف
+            🛒 الفاتورة فاضية.. اختار أصناف للبيع
           </div>
 
           <div
@@ -79,7 +80,7 @@
             :key="item.id"
             class="bg-white p-3 rounded-xl border shadow-sm transition-all duration-200"
             :class="
-              item.price < item.purchase_price
+              item.price < (item.purchase_price || 0)
                 ? 'border-red-300 bg-red-50/40 shadow-inner'
                 : 'border-gray-200'
             "
@@ -88,7 +89,7 @@
               <h4
                 class="font-bold text-sm"
                 :class="
-                  item.price < item.purchase_price
+                  item.price < (item.purchase_price || 0)
                     ? 'text-red-900'
                     : 'text-gray-800'
                 "
@@ -126,7 +127,7 @@
                   type="number"
                   class="w-full border rounded-lg p-1 text-center font-bold outline-none transition-colors"
                   :class="
-                    item.price < item.purchase_price
+                    item.price < (item.purchase_price || 0)
                       ? 'border-red-400 bg-red-100 text-red-700 focus:ring-2 focus:ring-red-500'
                       : 'border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500'
                   "
@@ -135,7 +136,7 @@
               <div
                 class="font-bold w-20 text-left"
                 :class="
-                  item.price < item.purchase_price
+                  item.price < (item.purchase_price || 0)
                     ? 'text-red-700'
                     : 'text-gray-800'
                 "
@@ -145,7 +146,7 @@
             </div>
 
             <div
-              v-if="item.price < item.purchase_price"
+              v-if="item.price < (item.purchase_price || 0)"
               class="text-[11px] text-red-600 font-bold mt-2 bg-red-100/50 p-1 rounded border border-red-200/60 flex items-center gap-1"
             >
               ⚠️ إنذار خسارة: تكلفة الصنف {{ item.purchase_price }} ج - أنت تخسر
@@ -219,7 +220,7 @@
         <div class="text-slate-700">
           العميل الفاضل:
           <span class="text-base text-slate-900 pr-1">
-            {{ currentClientObj?.name }}
+            {{ currentClientObj?.name || "---" }}
           </span>
         </div>
         <div class="text-slate-700">
@@ -267,20 +268,8 @@
         class="w-1/2 mr-auto bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5 text-sm font-bold mb-8"
       >
         <div class="flex justify-between text-slate-500">
-          <span>عدد الأصناف المبيعة:</span>
-          <span class="font-mono text-slate-800 text-base">
-            {{ cart.length }}
-          </span>
-        </div>
-        <div
-          class="flex justify-between text-slate-700 border-t border-slate-200 pt-2"
-        >
           <span>إجمالي الفاتورة الحالي:</span>
           <span class="text-slate-900">{{ totalAmount }} ج.م</span>
-        </div>
-        <div class="flex justify-between text-slate-500">
-          <span>الحساب الآجل السابق:</span>
-          <span class="text-red-600 font-mono">{{ previousBalance }} ج.م</span>
         </div>
         <div
           class="flex justify-between text-emerald-700 bg-emerald-50/50 p-1.5 rounded-lg"
@@ -288,24 +277,12 @@
           <span>المسدد كاش (نقداً):</span>
           <span>{{ paidAmount }} ج.م</span>
         </div>
-        <div
-          class="flex justify-between text-slate-900 border-t-2 border-slate-300 pt-2.5 text-base"
-        >
-          <span>الرصيد الإجمالي المستحق:</span>
-          <span class="text-xl font-black text-slate-900 font-mono">
-            {{ currentRunningBalance }} ج.m
-          </span>
-        </div>
       </div>
 
       <div
         class="border border-slate-200 rounded-xl p-4 text-center text-slate-500 font-medium text-xs leading-relaxed max-w-2xl mx-auto"
       >
         <p class="font-bold text-slate-700 mb-1">📌 ملاحظات إدارية:</p>
-        <p>
-          تُعتبر هذه الفاتورة وثيقة رسمية لتأكيد التعامل الجاري وصحة الأرصدة
-          المذكورة أعلاه.
-        </p>
         <p>
           الرجاء مراجعة الأصناف المستلمة فوراً، وشاكرين جداً لثقتكم بنا
           وبخدماتنا.
@@ -331,30 +308,31 @@ const invoiceNumber = ref("");
 const currentClientObj = computed(() =>
   clients.value.find((c) => c.id === selectedClient.value),
 );
-const previousBalance = computed(() => {
-  if (!currentClientObj.value) return 0;
-  return Math.abs(currentClientObj.value.balance);
-});
-const currentRunningBalance = computed(() => {
-  return previousBalance.value + totalAmount.value - paidAmount.value;
-});
 
+// جلب البيانات من الباك إند
 const fetchData = async () => {
   try {
     const [prodRes, cliRes] = await Promise.all([
       axios.get("http://127.0.0.1:8000/api/products"),
       axios.get("http://127.0.0.1:8000/api/clients"),
     ]);
-    products.value = prodRes.data.data;
-    clients.value = cliRes.data.data;
+
+    // سحب الداتا بمرونة سواء مغلفة في data.data أو data بس
+    products.value = prodRes.data?.data || prodRes.data || [];
+    clients.value = cliRes.data?.data || cliRes.data || [];
   } catch (error) {
     console.error("Error fetching sales data", error);
   }
 };
 
-const filteredProducts = computed(() =>
-  products.value.filter((p) => p.name.includes(searchQuery.value)),
-);
+// فلتر الأصناف الآمن (مش هيضرب إيرور undefined)
+const filteredProducts = computed(() => {
+  if (!Array.isArray(products.value)) return [];
+  return products.value.filter(
+    (p) => p.name && p.name.includes(searchQuery.value),
+  );
+});
+
 const totalAmount = computed(() =>
   cart.value.reduce((sum, item) => sum + item.price * item.qty, 0),
 );
@@ -362,7 +340,13 @@ const totalAmount = computed(() =>
 const addToCart = (product) => {
   const item = cart.value.find((i) => i.id === product.id);
   if (item) item.qty++;
-  else cart.value.push({ ...product, qty: 1, price: product.sale_price });
+  else {
+    cart.value.push({
+      ...product,
+      qty: 1,
+      price: product.selling_price || product.sale_price || 0,
+    });
+  }
 };
 
 const updateQty = (item, change) => {
@@ -376,22 +360,18 @@ const removeFromCart = (item) =>
 const submitSale = async () => {
   loading.value = true;
 
-  // 🛑 1. الحماية الكبرى الأولى: فرملة عملية الحفظ فوراً لو مفيش عميل محدد
   if (!selectedClient.value) {
-    alert(
-      "⚠️ خطأ إداري ومحاسبي: البيع الطياري ممنوع تماماً في النظام لحماية أرصدة الحسابات! الرجاء اختيار عميل مسجل لإتمام حفظ الفاتورة.",
-    );
+    alert("⚠️ عذراً، يجب اختيار عميل مسجل لإتمام فاتورة البيع.");
     loading.value = false;
     return;
   }
 
-  // 🌟 2. الحماية المحاسبية الثانية: التنبيه في حالة البيع بالخسارة
   const hasLossItems = cart.value.some(
-    (item) => parseFloat(item.price) < parseFloat(item.purchase_price),
+    (item) => parseFloat(item.price) < parseFloat(item.purchase_price || 0),
   );
   if (hasLossItems) {
     const confirmLoss = confirm(
-      "⚠️ انتبه يا هندسة: الفاتورة دي فيها أصناف بتتباع بأقل من سعر تكلفتها (خسارة)! هل أنت متأكد وعايز تكمل عملية البيع دي؟",
+      "⚠️ انتبه: الفاتورة دي فيها أصناف بتتباع بأقل من سعر تكلفتها (خسارة)! هل تريد الاستمرار؟",
     );
     if (!confirmLoss) {
       loading.value = false;
@@ -422,6 +402,7 @@ const submitSale = async () => {
     }, 300);
   } catch (error) {
     alert("حصل خطأ أثناء حفظ الفاتورة بالسيستم");
+    console.error(error);
   }
   loading.value = false;
 };
