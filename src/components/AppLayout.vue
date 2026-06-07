@@ -1,120 +1,227 @@
 <template>
-  <div class="flex h-screen bg-gray-50" dir="rtl">
+  <div class="flex h-screen bg-slate-50 overflow-hidden" dir="rtl">
     <aside
-      class="w-64 bg-slate-800 text-white flex flex-col transition-all duration-300"
+      :class="[
+        'bg-slate-900 text-white transition-all duration-300 ease-in-out flex flex-col shadow-2xl relative z-20',
+        isSidebarOpen ? 'w-64' : 'w-20',
+      ]"
     >
       <div
-        class="h-16 flex items-center justify-center border-b border-slate-700 shadow-md"
+        class="h-16 flex items-center justify-between px-4 border-b border-slate-800"
       >
-        <h1 class="text-2xl font-bold text-blue-400 flex items-center gap-2">
-          <span>⚙️</span>
+        <h2
+          v-show="isSidebarOpen"
+          class="font-black text-xl tracking-wider text-blue-400 whitespace-nowrap overflow-hidden"
+        >
           ERP System
-        </h1>
+        </h2>
+        <button
+          @click="isSidebarOpen = !isSidebarOpen"
+          class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition mx-auto"
+        >
+          <svg
+            v-if="!isSidebarOpen"
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            ></path>
+          </svg>
+          <svg
+            v-else
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
       </div>
 
-      <nav class="flex-1 p-4 space-y-2 overflow-y-auto mt-2">
+      <nav
+        class="flex-1 py-4 space-y-2 overflow-y-auto overflow-x-hidden px-3 custom-scrollbar"
+      >
         <router-link
           to="/"
-          class="block px-4 py-3 rounded-lg hover:bg-slate-700 transition"
-          active-class="bg-blue-600 hover:bg-blue-600 font-semibold"
+          class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition group"
+          title="لوحة التحكم"
         >
-          📊 لوحة التحكم
+          <span class="text-xl group-hover:scale-110 transition-transform">
+            📊
+          </span>
+          <span v-show="isSidebarOpen" class="font-bold whitespace-nowrap">
+            لوحة التحكم
+          </span>
         </router-link>
-
-        <div class="text-xs text-slate-400 font-semibold mt-6 mb-2 px-4">
-          إدارة العمليات
-        </div>
 
         <router-link
           to="/products"
-          class="block px-4 py-3 rounded-lg hover:bg-slate-700 transition text-gray-300"
-          active-class="bg-blue-600 text-white font-semibold"
+          class="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-600 transition group"
+          title="المخزن والأصناف"
         >
-          📦 المخزن والأصناف
+          <span class="text-xl group-hover:scale-110 transition-transform">
+            📦
+          </span>
+          <span v-show="isSidebarOpen" class="font-bold whitespace-nowrap">
+            المخزن والأصناف
+          </span>
         </router-link>
+
         <router-link
           to="/sales"
-          class="block px-4 py-3 rounded-lg hover:bg-slate-700 transition text-gray-300"
-          active-class="bg-green-600 text-white font-semibold"
+          class="flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-600 transition group"
+          title="فواتير المبيعات"
         >
-          🛒 فواتير المبيعات
+          <span class="text-xl group-hover:scale-110 transition-transform">
+            🛒
+          </span>
+          <span v-show="isSidebarOpen" class="font-bold whitespace-nowrap">
+            فواتير المبيعات
+          </span>
         </router-link>
+
         <router-link
           to="/purchases"
-          class="flex items-center gap-2 p-3 rounded-lg hover:bg-blue-600 transition text-white"
-          active-class="bg-blue-600 font-bold"
+          class="flex items-center gap-3 p-3 rounded-xl hover:bg-orange-600 transition group"
+          title="فواتير المشتريات"
         >
-          <span>🚚</span>
-          <span>فواتير المشتريات</span>
+          <span class="text-xl group-hover:scale-110 transition-transform">
+            🚚
+          </span>
+          <span v-show="isSidebarOpen" class="font-bold whitespace-nowrap">
+            فواتير المشتريات
+          </span>
         </router-link>
+
         <router-link
           to="/clients"
-          class="block px-4 py-3 rounded-lg hover:bg-slate-700 transition text-gray-300"
-          active-class="bg-blue-600 text-white font-semibold"
+          class="flex items-center gap-3 p-3 rounded-xl hover:bg-purple-600 transition group"
+          title="العملاء (الديون لينا)"
         >
-          👥 العملاء (الديون لينا)
+          <span class="text-xl group-hover:scale-110 transition-transform">
+            👥
+          </span>
+          <span v-show="isSidebarOpen" class="font-bold whitespace-nowrap">
+            العملاء (الديون لينا)
+          </span>
         </router-link>
 
         <router-link
           to="/client-statement"
-          class="block px-4 py-3 rounded-lg hover:bg-slate-700 transition text-gray-300"
-          active-class="bg-blue-600 text-white font-semibold"
+          class="flex items-center gap-3 p-3 rounded-xl hover:bg-amber-600 transition group"
+          title="كشف حساب العملاء"
         >
-          <span>📜</span>
-          <span>كشف حساب العملاء</span>
+          <span class="text-xl group-hover:scale-110 transition-transform">
+            📜
+          </span>
+          <span v-show="isSidebarOpen" class="font-bold whitespace-nowrap">
+            كشف حساب العملاء
+          </span>
         </router-link>
 
         <router-link
           to="/suppliers"
-          class="block px-4 py-3 rounded-lg hover:bg-slate-700 transition text-gray-300"
-          active-class="bg-purple-600 text-white font-semibold"
+          class="flex items-center gap-3 p-3 rounded-xl hover:bg-indigo-600 transition group"
+          title="الموردين (الديون علينا)"
         >
-          🏢 الموردين (الديون علينا)
+          <span class="text-xl group-hover:scale-110 transition-transform">
+            🏢
+          </span>
+          <span v-show="isSidebarOpen" class="font-bold whitespace-nowrap">
+            الموردين (الديون علينا)
+          </span>
         </router-link>
 
         <router-link
           to="/supplier-statement"
-          class="block px-4 py-3 rounded-lg hover:bg-slate-700 transition text-gray-300"
-          active-class="bg-purple-600 text-white font-semibold"
+          class="flex items-center gap-3 p-3 rounded-xl hover:bg-rose-600 transition group"
+          title="كشف حساب الموردين"
         >
-          <span>📜</span>
-          <span>كشف حساب الموردين</span>
+          <span class="text-xl group-hover:scale-110 transition-transform">
+            🧾
+          </span>
+          <span v-show="isSidebarOpen" class="font-bold whitespace-nowrap">
+            كشف حساب الموردين
+          </span>
         </router-link>
 
         <router-link
           to="/returns"
-          class="block px-4 py-3 rounded-lg hover:bg-slate-700 transition text-gray-300"
-          active-class="bg-orange-500 text-white font-semibold"
+          class="flex items-center gap-3 p-3 rounded-xl hover:bg-red-500 transition group"
+          title="المرتجعات"
         >
-          🔄 المرتجعات
+          <span class="text-xl group-hover:scale-110 transition-transform">
+            🔄
+          </span>
+          <span v-show="isSidebarOpen" class="font-bold whitespace-nowrap">
+            المرتجعات
+          </span>
         </router-link>
       </nav>
     </aside>
 
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <main
+      class="flex-1 h-screen overflow-y-auto relative transition-all duration-300"
+    >
       <header
-        class="h-16 bg-white shadow-sm flex items-center px-6 justify-between border-b z-10"
+        class="h-16 bg-white shadow-sm border-b px-6 flex items-center justify-between sticky top-0 z-10 print:hidden"
       >
-        <h2 class="text-xl font-semibold text-gray-800">نظام الإدارة الشامل</h2>
-
-        <div
-          class="flex items-center gap-3 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 cursor-pointer hover:bg-gray-100 transition"
-        >
-          <div
-            class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm"
+        <h1 class="font-bold text-slate-700">نظام الإدارة الشامل</h1>
+        <div class="flex items-center gap-3">
+          <span
+            class="bg-blue-100 text-blue-700 p-2 rounded-full font-bold text-sm"
           >
             م
-          </div>
-          <span class="text-sm font-medium text-gray-700 pr-1">
-            مدير النظام
           </span>
+          <span class="font-bold text-sm">مدير النظام</span>
         </div>
       </header>
 
-      <main class="flex-1 overflow-x-hidden overflow-y-auto p-6">
-        <router-view></router-view>
-      </main>
-    </div>
+      <div class="p-6">
+        <router-view />
+      </div>
+    </main>
   </div>
 </template>
 
+<script setup>
+import { ref } from "vue";
+
+// حالة السايد بار (مفتوح افتراضياً)
+const isSidebarOpen = ref(true);
+</script>
+
+<style>
+/* تجميل الـ Scrollbar بتاع السايد بار عشان ميبوظش الشكل */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+}
+
+/* تنسيق خاص للينك النشط (عشان ينور لما تقف عليه) */
+.router-link-active {
+  background-color: #3b82f6 !important; /* لون أزرق */
+  color: white !important;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+</style>
